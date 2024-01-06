@@ -9,6 +9,9 @@ const phraseTableStartingIndex = 1
 const phraseTableCount = 46085
 // ******************************************
 
+interface IHeaders {
+  'X-RapidAPI-Proxy-Secret': string|undefined;
+}
 
 interface IReply {
   200: {phrase:string};
@@ -20,9 +23,14 @@ interface IReply {
 
 const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
 
-  fastify.get<{ Reply:IReply }>(
+  fastify.get<{ Headers:IHeaders, Reply:IReply }>(
     '/',
     async  (request, reply) => {
+      const rapidapiHeader = request.headers['X-RapidAPI-Proxy-Secret']
+      if(rapidapiHeader==null || process.RAPIDAPI_SECRET !== rapidapiHeader){
+        reply.status(400).send({error:`Request headers X-RapidAPI-Proxy-Secret is invalid.`})
+        return
+      }
   
       const phrase = await prisma.phrase.findFirst({
         where:{id:Math.floor(Math.random() * phraseTableCount) + phraseTableStartingIndex}
