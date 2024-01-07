@@ -1,5 +1,6 @@
 import { FastifyPluginAsync } from 'fastify'
 import { prisma } from '../lib/prisma'
+import { Phrase } from '@prisma/client';
 
 
 
@@ -31,16 +32,24 @@ const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         return
       }
   
-      const phrase = await prisma.phrase.findFirst({
-        where:{id:Math.floor(Math.random() * phraseTableCount) + phraseTableStartingIndex}
-      })
-  
-      if(phrase==null){
-        reply.status(500).send({error:`Server Error: phrase should be string but it is ${phrase}`})
+      let phrase:Phrase|undefined|null
+      try{
+        phrase = await prisma.phrase.findFirst({
+          where:{id:Math.floor(Math.random() * phraseTableCount) + phraseTableStartingIndex}
+        })
+      }catch(e){
+        console.error("SERVER ERROR:",e)
+        reply.status(400).send({error:`A server error has occurred! Please let us know.`})
         return
       }
-  
-      reply.status(200).send({ phrase: phrase.content });
+    
+        if(phrase==null){
+          console.error("SERVER ERROR: phrase==null")
+          reply.status(500).send({error:`Server Error: phrase should be string but it is ${phrase}`})
+          return
+        }
+    
+        reply.status(200).send({ phrase: phrase.content });
     }
   )
 }
