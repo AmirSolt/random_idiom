@@ -27,7 +27,7 @@ const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     '/',
     async  (request, reply) => {
       const rapidapiHeader = request.headers['X-RapidAPI-Proxy-Secret']
-      if(rapidapiHeader==null || process.RAPIDAPI_SECRET !== rapidapiHeader){
+      if(rapidapiHeader==null || process.env.RAPIDAPI_SECRET !== rapidapiHeader){
         reply.status(400).send({error:`Request headers X-RapidAPI-Proxy-Secret is invalid.`})
         return
       }
