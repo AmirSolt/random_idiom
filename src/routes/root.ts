@@ -10,7 +10,7 @@ const phraseTableCount = 46085
 // ******************************************
 
 interface IHeaders {
-  'X-RapidAPI-Proxy-Secret': string|undefined;
+  'x-rapidapi-proxy-secret': string|undefined;
 }
 
 interface IReply {
@@ -20,16 +20,14 @@ interface IReply {
   '5xx': { error: string };
 }
 
-
 const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
 
   fastify.get<{ Headers:IHeaders, Reply:IReply }>(
     '/',
     async  (request, reply) => {
-      console.log(request.headers)
-      const rapidapiHeader = request.headers['X-RapidAPI-Proxy-Secret']
+      const rapidapiHeader = request.headers['x-rapidapi-proxy-secret']
       if(rapidapiHeader==null || process.env.RAPIDAPI_SECRET !== rapidapiHeader){
-        reply.status(400).send({error:`Request headers X-RapidAPI-Proxy-Secret is invalid. rapidapiHeader:${rapidapiHeader}`})
+        reply.status(400).send({error:`Request headers x-rapidapi-proxy-secret is invalid. rapidapiHeader:${rapidapiHeader}`})
         return
       }
   
